@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "coderev.helloWorld",
-        "title": "Hello World"
+        "command": "coderev.indexWorkspace",
+        "title": "CodeRev: Index Workspace"
       }
     ]
   },

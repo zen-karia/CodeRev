@@ -1,6 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -18,7 +19,11 @@ export function activate(context: vscode.ExtensionContext) {
 		// Display a message box to the user
 		vscode.window.showInformationMessage('Indexing workspace...');
 		const files = await vscode.workspace.findFiles('**/*', '**/{node_modules,.git}/**');
-		console.log(files);
+
+		const allowedExtensions = ['.ts', '.tsx', '.js', '.jsx', '.py', '.go', '.java', '.cpp', '.c', '.cs', '.rb', '.rs'];
+		const filteredFiles = files.filter(file => allowedExtensions.includes(path.extname(file.fsPath)));
+
+		console.log(filteredFiles);
 	});
 
 	context.subscriptions.push(disposable);

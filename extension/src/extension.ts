@@ -32,7 +32,25 @@ export async function activate(context: vscode.ExtensionContext) {
 		const allowedExtensions = ['.ts', '.tsx', '.js', '.jsx', '.py', '.go', '.java', '.cpp', '.c', '.cs', '.rb', '.rs'];
 		const filteredFiles = files.filter(file => allowedExtensions.includes(path.extname(file.fsPath)));
 
-		console.log(filteredFiles);
+		const body = JSON.stringify({ files: filteredFiles.map(f => f.fsPath) });
+
+		const options = {
+    		hostname: 'localhost',
+    		port: 8000,
+    		path: '/index',
+    		method: 'POST',
+    		headers: {
+        		'Content-Type': 'application/json',
+        		'Content-Length': Buffer.byteLength(body)
+    		}
+		};
+
+		const req = http.request(options, (res) => {
+    		console.log("Index response:", res.statusCode);
+		});
+
+		req.write(body);
+		req.end();
 	});
 
 	context.subscriptions.push(disposable);

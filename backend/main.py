@@ -44,4 +44,29 @@ def index(request: IndexRequest):
                 })
         except Exception:
             continue
+    
+    if not chunks:
+        return {"chunks_count":0}
+    
+    chunk_count = len(chunks)
+    MAX_CHARS = 12000
+    texts = [chunk["text"][:MAX_CHARS] for chunk in chunks]
+
+    for i in range(0, chunk_count, 500):
+        sub_chunks = chunks[i:i+500]
+        sub_texts = texts[i:i+500]
+        
+        response = openai.embeddings.create(
+            model="text-embedding-3-small",
+            input=sub_texts
+        )
+    
+        collection.upsert(
+            ids=[f"{chunk['file']}:{chunk['start_line']}" for chunk in sub_chunks],
+            embeddings=[item.embedding for item in response.data],
+            documents=sub_texts,
+            metadatas=[{"file": chunk["file"], "start_line": chunk["start_line"], "end_line": chunk["end_line"]} for chunk in sub_chunks]
+        )
+
     return {"chunks_count": len(chunks)}
+

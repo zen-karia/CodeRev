@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+import ast
 
 class IndexRequest(BaseModel):
     files: list[str]
@@ -11,5 +12,30 @@ def health():
     return {"status": "ok"}
 
 @app.post("/index")
-def index_workspace(request: IndexRequest):
-    return {"received": len(request.files)}
+def index(request: IndexRequest):
+    chunks = []
+    for file in request.files:
+        try:
+            contents = open(file, encoding='utf-8', errors='ignore').read()
+            lines = contents.split('\n')
+            if file.endswith('.py'):
+                tree = ast.parse(contents)
+                for node in ast.walk(tree):
+                    if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+                        text = '\n'.join(lines[node.lineno - 1 : node.end_lineno])
+                        chunks.append({
+                            "text": text,
+                            "file": file,
+                            "start_line": node.lineno,
+                            "end_line": node.end_lineno
+                        })
+            else:
+                chunks.append({
+                    "text": contents,
+                    "file": file,
+                    "start_line": 1,
+                    "end_line": len(contents.split('\n'))
+                })
+        except Exception:
+            continue
+    return {"chunks_count": len(chunks)}

@@ -83,6 +83,28 @@ export async function activate(context: vscode.ExtensionContext) {
 		const files = JSON.parse(diffData);
 		const diff = files.map((f: any) => `### ${f.filename}\n${f.patch || ''}`).join('\n\n');
 
+		await new Promise<void>((resolve) => {
+			const options = {
+				hostname: '127.0.0.1',
+				port: 8000,
+				path: '/review',
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Content-Length': Buffer.byteLength(JSON.stringify({ diff: diff}))
+				}
+			};
+
+				const req = http.request(options, (res) => {
+					console.log(`Review response:`, res.statusCode);
+					res.resume();
+					res.on('end', resolve);
+				});
+
+				req.write(JSON.stringify({ diff: diff}));
+				req.end();
+			});
+
 	});
 
 	context.subscriptions.push(disposable);

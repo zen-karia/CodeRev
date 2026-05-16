@@ -10,6 +10,9 @@ collection = chroma_client.get_or_create_collection(name="coderev")
 
 class IndexRequest(BaseModel):
     files: list[str]
+    
+class PrReview(BaseModel):
+    diff: str
 
 app = FastAPI()
 
@@ -69,4 +72,34 @@ def index(request: IndexRequest):
         )
 
     return {"chunks_count": len(chunks)}
+
+@app.post("/review")
+def review(diffData: PrReview):
+    response = openai.embeddings.create(
+        model="text-embedding-3-small",
+        input=[diffData.diff]
+    )
+    
+    result = collection.query(query_embeddings=[response.data[0].embedding], n_results=5)
+    
+    chunks = result["documents"][0]
+    context = "\n\n---\n\n".join(chunks)
+    
+    prompt = f"""You are a senior code reviewer. Review the following pull request diff.
+
+    Here is relevant context from the codebase:
+    {context}
+
+    Here is the PR diff:
+    {diffData.diff}
+
+    Provide a concise code review highlighting bugs, issues, and suggestions."""
+    
+    chat_response = openai.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    
+    return {"review": chat_response.choices[0].message.content}
+
 

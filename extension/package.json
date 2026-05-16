@@ -16,8 +16,19 @@
       {
         "command": "coderev.indexWorkspace",
         "title": "CodeRev: Index Workspace"
+      },
+      {
+        "command": "coderev.reviewPR",
+        "title": "CodeRev: Review PR"
       }
-    ]
+    ],
+    "configuration": {
+      "properties": {
+          "coderev.githubToken": { "type": "string", "description": "GitHub personal access token" },
+          "coderev.repoOwner": { "type": "string", "description": "GitHub repo owner" },
+          "coderev.repoName": { "type": "string", "description": "GitHub repo name" }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

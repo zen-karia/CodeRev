@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 .env
 coderev_debug.log
+chroma_db/

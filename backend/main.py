@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 openai.api_key = os.environ.get('OPENAI_API_KEY')
-chroma_client = chromadb.Client()
+chroma_client = chromadb.PersistentClient(path="./chroma_db")
 collection = chroma_client.get_or_create_collection(name="coderev")
 
 class IndexRequest(BaseModel):

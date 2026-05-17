@@ -17,3 +17,31 @@ A VS Code extension that uses RAG (Retrieval-Augmented Generation) to perform AI
 - ChromaDB persists the index to disk — no re-indexing needed on restart
 - Reviews are grounded in your actual codebase, not just the diff in isolation
 - Review output displayed in a dedicated VS Code webview panel
+
+## Requirements
+
+- Python 3.10+
+- A Python virtual environment at `backend/venv/` with the following packages installed:
+  ```
+  fastapi uvicorn openai chromadb python-dotenv
+  ```
+- An OpenAI API key
+- A GitHub personal access token with `repo` scope
+
+## Setup
+
+1. Clone the repository
+2. Create and activate a Python virtual environment inside `backend/`:
+   ```bash
+   cd backend
+   python -m venv venv
+   venv\Scripts\activate      # Windows
+   pip install fastapi uvicorn openai chromadb python-dotenv
+   ```
+3. Create a `.env` file inside `backend/` with your OpenAI API key:
+   ```
+   OPENAI_API_KEY=your_key_here
+   ```
+4. Open the `extension/` folder in VS Code
+5. Run `npm install` then `npm run watch`
+6. Press `F5` to launch the Extension Development Host

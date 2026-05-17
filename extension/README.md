@@ -45,3 +45,19 @@ A VS Code extension that uses RAG (Retrieval-Augmented Generation) to perform AI
 4. Open the `extension/` folder in VS Code
 5. Run `npm install` then `npm run watch`
 6. Press `F5` to launch the Extension Development Host
+
+## Extension Settings
+
+Configure these in VS Code settings (`Ctrl+,`, search `coderev`):
+
+| Setting | Description |
+|---|---|
+| `coderev.githubToken` | GitHub personal access token (needs `repo` scope) |
+| `coderev.repoOwner` | GitHub username or org (e.g. `zen-karia`) |
+| `coderev.repoName` | Repository name (e.g. `CodeRev`) |
+
+## Usage
+
+1. Open the Extension Development Host (`F5`)
+2. `Ctrl+Shift+P` → **CodeRev: Index Workspace** — indexes all supported files in the workspace
+3. `Ctrl+Shift+P` → **CodeRev: Review PR** — enter a PR number and wait for the review to appear in a new tab

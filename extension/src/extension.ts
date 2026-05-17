@@ -96,9 +96,14 @@ export async function activate(context: vscode.ExtensionContext) {
 			};
 
 				const req = http.request(options, (res) => {
-					console.log(`Review response:`, res.statusCode);
-					res.resume();
-					res.on('end', resolve);
+					let data = '';
+					res.on('data', chunk => data += chunk);
+					res.on('end', () => {
+						const reviewText = JSON.parse(data).review;
+						const panel = vscode.window.createWebviewPanel('coderev.review', 'CodeRev PR Review', vscode.ViewColumn.One);
+						panel.webview.html = `<html><body><pre>${reviewText}</pre></body></html>`;
+						resolve();
+					});
 				});
 
 				req.write(JSON.stringify({ diff: diff}));

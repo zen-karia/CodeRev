@@ -80,7 +80,13 @@ export async function activate(context: vscode.ExtensionContext) {
 			}).on('error', reject).end();
 		});
 
-		const files = JSON.parse(diffData);
+		var files = [];
+		try {
+			files = JSON.parse(diffData);
+		} catch (error) {
+			vscode.window.showErrorMessage('Review failed: unexpected response from backend.');
+			return;
+		}
 		const diff = files.map((f: any) => `### ${f.filename}\n${f.patch || ''}`).join('\n\n');
 
 		await new Promise<void>((resolve) => {
@@ -99,28 +105,32 @@ export async function activate(context: vscode.ExtensionContext) {
 					let data = '';
 					res.on('data', chunk => data += chunk);
 					res.on('end', () => {
-						const reviewText = JSON.parse(data).review;
-						const panel = vscode.window.createWebviewPanel('coderev.review', 'CodeRev PR Review', vscode.ViewColumn.One, { enableScripts: true });
-						panel.webview.html = `
-							<html>
-							<head>
-							<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'unsafe-inline';">
-							<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-							<style>
-								body { font-family: sans-serif; padding: 20px; background: #1e1e1e; color: #d4d4d4; }
-								h1, h2, h3 { color: #569cd6; }
-								code { background: #2d2d2d; padding: 2px 6px; border-radius: 3px; }
-								pre { background: #2d2d2d; padding: 12px; border-radius: 6px; }
-								hr { border-color: #444; }
-							</style>
-							</head>
-							<body>
-							<div id="content"></div>
-							<script>
-								document.getElementById('content').innerHTML = marked.parse(\`${reviewText.replace(/`/g, '\\`')}\`);
-							</script>
-							</body>
-							</html>`;
+						try {
+							const reviewText = JSON.parse(data).review;
+							const panel = vscode.window.createWebviewPanel('coderev.review', 'CodeRev PR Review', vscode.ViewColumn.One, { enableScripts: true });
+							panel.webview.html = `
+								<html>
+								<head>
+								<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'unsafe-inline';">
+								<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+								<style>
+									body { font-family: sans-serif; padding: 20px; background: #1e1e1e; color: #d4d4d4; }
+									h1, h2, h3 { color: #569cd6; }
+									code { background: #2d2d2d; padding: 2px 6px; border-radius: 3px; }
+									pre { background: #2d2d2d; padding: 12px; border-radius: 6px; }
+									hr { border-color: #444; }
+								</style>
+								</head>
+								<body>
+								<div id="content"></div>
+								<script>
+									document.getElementById('content').innerHTML = marked.parse(\`${reviewText.replace(/`/g, '\\`')}\`);
+								</script>
+								</body>
+								</html>`;
+						} catch (error) {
+							vscode.window.showErrorMessage('Review failed: unexpected response from backend.');
+						}
 						resolve();
 					});
 				});

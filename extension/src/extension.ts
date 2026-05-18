@@ -6,6 +6,9 @@ import * as https from 'https';
 
 export async function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "coderev" is now active!');
+	const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+	statusBar.show();
+	context.subscriptions.push(statusBar);
 
 	const backendPath = path.join(context.extensionPath, "..", "backend");
 	const program = path.join(backendPath, 'venv', 'Scripts', 'python.exe');
@@ -15,6 +18,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	await waitForServer();
 
 	const disposable = vscode.commands.registerCommand('coderev.indexWorkspace', async () => {
+		statusBar.text = '$(sync~spin) CodeRev: Indexing... please wait';
 		vscode.window.showInformationMessage('Indexing workspace...');
 		const files = await vscode.workspace.findFiles('**/*', '**/{node_modules,.git}/**');
 
@@ -47,6 +51,8 @@ export async function activate(context: vscode.ExtensionContext) {
 				req.end();
 			});
 		}
+
+		statusBar.text = '$(check) CodeRev: Index complete — run Review PR';
 	});
 
 	const reviewPR = vscode.commands.registerCommand('coderev.reviewPR', async () => {

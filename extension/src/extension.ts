@@ -105,6 +105,13 @@ export async function activate(context: vscode.ExtensionContext) {
 					let data = '';
 					res.on('data', chunk => data += chunk);
 					res.on('end', () => {
+						if (res.statusCode !== 200) {
+							const error = JSON.parse(data).detail;
+							vscode.window.showErrorMessage(error);
+							resolve();
+							return;
+						}
+
 						try {
 							const reviewText = JSON.parse(data).review;
 							const panel = vscode.window.createWebviewPanel('coderev.review', 'CodeRev PR Review', vscode.ViewColumn.One, { enableScripts: true });

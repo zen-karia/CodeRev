@@ -82,6 +82,10 @@ def index(request: IndexRequest):
 
 @app.post("/review")
 def review(diffData: PrReview):
+    if collection.count() == 0:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Workspace not indexed. Run CodeRev: Index Workspace first.")
+    
     response = openai.embeddings.create(
         model="text-embedding-3-small",
         input=[diffData.diff]

@@ -25,6 +25,11 @@ def index(request: IndexRequest):
     chunks = []
     for file in request.files:
         try:
+            mtime = os.path.getmtime(file)
+            existing = collection.get(where={"file": file}, limit=1)
+            
+            if existing["ids"] and existing["metadatas"][0]["mtime"] == mtime:
+                continue
             contents = open(file, encoding='utf-8', errors='ignore').read()
             lines = contents.split('\n')
             if file.endswith('.py'):
@@ -36,14 +41,16 @@ def index(request: IndexRequest):
                             "text": text,
                             "file": file,
                             "start_line": node.lineno,
-                            "end_line": node.end_lineno
+                            "end_line": node.end_lineno,
+                            "mtime": mtime
                         })
             else:
                 chunks.append({
                     "text": contents,
                     "file": file,
                     "start_line": 1,
-                    "end_line": len(contents.split('\n'))
+                    "end_line": len(contents.split('\n')),
+                    "mtime": mtime
                 })
         except Exception:
             continue
@@ -68,7 +75,7 @@ def index(request: IndexRequest):
             ids=[f"{chunk['file']}:{chunk['start_line']}" for chunk in sub_chunks],
             embeddings=[item.embedding for item in response.data],
             documents=sub_texts,
-            metadatas=[{"file": chunk["file"], "start_line": chunk["start_line"], "end_line": chunk["end_line"]} for chunk in sub_chunks]
+            metadatas=[{"file": chunk["file"], "start_line": chunk["start_line"], "end_line": chunk["end_line"], "mtime": chunk["mtime"]} for chunk in sub_chunks],
         )
 
     return {"chunks_count": len(chunks)}

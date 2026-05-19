@@ -86,12 +86,20 @@ def review(diffData: PrReview):
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="Workspace not indexed. Run CodeRev: Index Workspace first.")
     
+    files_changed = diffData.diff.count('### ')
+    if files_changed <= 2:
+        n_results = 8
+    elif files_changed <= 5:
+        n_results = 12
+    else:
+        n_results = 20
+    
     response = openai.embeddings.create(
         model="text-embedding-3-small",
         input=[diffData.diff]
     )
     
-    result = collection.query(query_embeddings=[response.data[0].embedding], n_results=5)
+    result = collection.query(query_embeddings=[response.data[0].embedding], n_results=n_results)
     
     chunks = result["documents"][0]
     context = "\n\n---\n\n".join(chunks)

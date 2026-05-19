@@ -45,9 +45,13 @@ export async function activate(context: vscode.ExtensionContext) {
 						};
 
 						const req = http.request(options, (res) => {
-							console.log(`Batch ${i / 100 + 1} response:`, res.statusCode);
-							res.resume();
-							res.on('end', resolve);
+							let data = '';
+							res.on('data', chunk => data += chunk);
+							res.on('end', () => {
+    							const result = JSON.parse(data);
+    							console.log(`Batch ${i / 100 + 1} — indexed: ${result.chunks_count}, skipped: ${result.skipped}`);
+    							resolve();
+							});
 						});
 
 						req.write(body);

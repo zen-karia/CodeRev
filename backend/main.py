@@ -23,12 +23,14 @@ def health():
 @app.post("/index")
 def index(request: IndexRequest):
     chunks = []
+    skipped = 0
     for file in request.files:
         try:
             mtime = os.path.getmtime(file)
             existing = collection.get(where={"file": file}, limit=1)
             
             if existing["ids"] and existing["metadatas"][0]["mtime"] == mtime:
+                skipped += 1
                 continue
             contents = open(file, encoding='utf-8', errors='ignore').read()
             lines = contents.split('\n')
@@ -56,7 +58,7 @@ def index(request: IndexRequest):
             continue
     
     if not chunks:
-        return {"chunks_count":0}
+        return { "chunks_count":0 }
     
     chunk_count = len(chunks)
     MAX_CHARS = 12000
@@ -78,7 +80,7 @@ def index(request: IndexRequest):
             metadatas=[{"file": chunk["file"], "start_line": chunk["start_line"], "end_line": chunk["end_line"], "mtime": chunk["mtime"]} for chunk in sub_chunks],
         )
 
-    return {"chunks_count": len(chunks)}
+    return {"chunks_count": len(chunks), "skipped": skipped}
 
 @app.post("/review")
 def review(diffData: PrReview):

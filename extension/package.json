@@ -8,7 +8,7 @@
     "url": "https://github.com/zen-karia/CodeRev"
   },
   "icon": "images/icon.png",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.118.0"
   },

@@ -12,3 +12,6 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
+backend/venv/**
+backend/chroma_db/**
+backend/.env

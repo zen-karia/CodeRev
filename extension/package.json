@@ -2,6 +2,11 @@
   "name": "coderev",
   "displayName": "CodeRev",
   "description": "AI-powered code review using RAG",
+  "publisher": "zen-karia",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zen-karia/CodeRev"
+  },
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.118.0"

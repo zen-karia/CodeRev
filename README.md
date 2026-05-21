@@ -18,46 +18,62 @@ A VS Code extension that uses RAG (Retrieval-Augmented Generation) to perform AI
 - Reviews are grounded in your actual codebase, not just the diff in isolation
 - Review output displayed in a dedicated VS Code webview panel
 
-## Requirements
+---
 
-- Python 3.10+
-- A Python virtual environment at `backend/venv/` with the following packages installed:
-  ```
-  fastapi uvicorn openai chromadb python-dotenv
-  ```
-- An OpenAI API key
-- A GitHub personal access token with `repo` scope
+## Option 1: Install from Marketplace
 
-## Setup
-
-1. Clone the repository
-2. Create and activate a Python virtual environment inside `backend/`:
+1. Install **CodeRev** from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=zen-karia.coderev)
+2. Set up the Python backend (required — the extension spawns a local FastAPI server):
    ```bash
-   cd backend
+   cd <extension-install-path>/backend
    python -m venv venv
    venv\Scripts\activate      # Windows
    pip install fastapi uvicorn openai chromadb python-dotenv
    ```
-3. Create a `.env` file inside `backend/` with your OpenAI API key:
+3. Create a `.env` file inside the `backend/` folder:
+   ```
+   OPENAI_API_KEY=your_key_here
+   ```
+4. Configure settings in VS Code (`Ctrl+,`, search `coderev`):
+
+| Setting | Description |
+|---|---|
+| `coderev.githubToken` | GitHub personal access token (needs `repo` scope) |
+| `coderev.repoOwner` | GitHub username or org |
+| `coderev.repoName` | Repository name |
+
+5. `Ctrl+Shift+P` → **CodeRev: Index Workspace**
+6. `Ctrl+Shift+P` → **CodeRev: Review PR** → enter a PR number
+
+---
+
+## Option 2: Clone and Run Locally
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/zen-karia/CodeRev.git
+   ```
+2. Set up the Python backend:
+   ```bash
+   cd CodeRev/extension/backend
+   python -m venv venv
+   venv\Scripts\activate      # Windows
+   pip install fastapi uvicorn openai chromadb python-dotenv
+   ```
+3. Create a `.env` file inside `extension/backend/`:
    ```
    OPENAI_API_KEY=your_key_here
    ```
 4. Open the `extension/` folder in VS Code
 5. Run `npm install` then `npm run watch`
 6. Press `F5` to launch the Extension Development Host
+7. Configure settings in the Extension Development Host (`Ctrl+,`, search `coderev`) — same settings as above
 
-## Extension Settings
+---
 
-Configure these in VS Code settings (`Ctrl+,`, search `coderev`):
+## Requirements
 
-| Setting | Description |
-|---|---|
-| `coderev.githubToken` | GitHub personal access token (needs `repo` scope) |
-| `coderev.repoOwner` | GitHub username or org (e.g. `zen-karia`) |
-| `coderev.repoName` | Repository name (e.g. `CodeRev`) |
-
-## Usage
-
-1. Open the Extension Development Host (`F5`)
-2. `Ctrl+Shift+P` → **CodeRev: Index Workspace** — indexes all supported files in the workspace
-3. `Ctrl+Shift+P` → **CodeRev: Review PR** — enter a PR number and wait for the review to appear in a new tab
+- Python 3.10+
+- Node.js + npm
+- An OpenAI API key
+- A GitHub personal access token with `repo` scope

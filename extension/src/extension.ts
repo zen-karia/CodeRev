@@ -7,7 +7,7 @@ import * as https from 'https';
 export async function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "coderev" is now active!');
 
-	const backendPath = path.join(context.extensionPath, "..", "backend");
+	const backendPath = path.join(context.extensionPath, "backend");
 	const program = path.join(backendPath, 'venv', 'Scripts', 'python.exe');
 	const args = ["-m", "uvicorn", "main:app", "--reload"];
 
